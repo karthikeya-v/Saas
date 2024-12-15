@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: zeek_logs
+      MYSQL_USER: zeek_user
+      MYSQL_PASSWORD: zeek_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./saas.csv:/docker-entrypoint-initdb.d/saas.csv
+
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: python
+    depends_on:
+      - mysql
+    volumes:
+      - ./sql_processor.py:/app/sql_processor.py
+      - ./dns.log:/app/dns.log
+    environment:
+      DB_HOST: mysql
+      DB_USER: zeek_user
+      DB_PASSWORD: zeek_password
+      DB_NAME: zeek_logs
+    command: ["python3", "/app/sql_processor.py"]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "4500:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  mysql-data:
+  grafana-data:
