@@ -1,0 +1,90 @@
+{
+  "title": "TimeGrid",
+  "uid": "timegrid-main",
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "browser",
+  "time": { "from": "now-7d", "to": "now" },
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "user",
+        "label": "User",
+        "type": "query",
+        "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+        "query": "SELECT apple_sub AS __text, id AS __value FROM users",
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "piechart",
+      "title": "Today by category",
+      "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(category,'uncategorized') AS metric, COUNT(*) AS value FROM minutes WHERE user_id = $user AND source <> 'gap' AND DATE(ts) = CURDATE() GROUP BY 1 ORDER BY value DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Unaccounted minutes today",
+      "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value FROM minutes WHERE user_id = $user AND source = 'gap' AND DATE(ts) = CURDATE()",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [{"color":"green","value":null},{"color":"orange","value":30},{"color":"red","value":120}] } } }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Accounted minutes today",
+      "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value FROM minutes WHERE user_id = $user AND source <> 'gap' AND DATE(ts) = CURDATE()",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "heatmap",
+      "title": "Last 7 days minute heatmap",
+      "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 10 },
+      "targets": [
+        {
+          "rawSql": "SELECT ts AS time, CASE WHEN source = 'gap' THEN 0 ELSE 1 END AS value FROM minutes WHERE user_id = $user AND ts >= NOW() - INTERVAL 7 DAY",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "barchart",
+      "title": "Planned vs actual (today)",
+      "datasource": { "type": "mysql", "uid": "TimeGrid MySQL" },
+      "gridPos": { "x": 0, "y": 18, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT COALESCE(p.category,'uncategorized') AS category, SUM(TIMESTAMPDIFF(MINUTE, p.start_ts, p.end_ts)) AS planned, (SELECT COUNT(*) FROM minutes m WHERE m.user_id = $user AND DATE(m.ts) = CURDATE() AND COALESCE(m.category,'uncategorized') = COALESCE(p.category,'uncategorized') AND m.source <> 'gap') AS actual FROM planned_blocks p WHERE p.user_id = $user AND p.day = CURDATE() GROUP BY 1",
+          "format": "table"
+        }
+      ]
+    }
+  ]
+}

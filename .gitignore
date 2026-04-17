@@ -1,0 +1,23 @@
+myenv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+*.egg-info/
+
+# iOS
+ios/**/build/
+ios/**/DerivedData/
+ios/**/*.xcuserstate
+ios/**/*.xcworkspace/xcuserdata/
+ios/**/xcuserdata/
+ios/**/*.xcodeproj/xcuserdata/
+ios/**/*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Backend build artefacts
+backend/dist/
+backend/app.zip
+
+# OS
+.DS_Store

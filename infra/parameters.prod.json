@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "prod" },
+    "namePrefix": { "value": "timegrid" },
+    "mysqlAdminUser": { "value": "timegrid_admin" },
+    "mysqlAdminPassword": { "reference": { "keyVault": { "id": "/subscriptions/<SUB_ID>/resourceGroups/timegrid-prod/providers/Microsoft.KeyVault/vaults/<KV_NAME>" }, "secretName": "mysql-admin-password" } },
+    "jwtSecret": { "reference": { "keyVault": { "id": "/subscriptions/<SUB_ID>/resourceGroups/timegrid-prod/providers/Microsoft.KeyVault/vaults/<KV_NAME>" }, "secretName": "jwt-secret" } }
+  }
+}

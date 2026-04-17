@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>TimeGrid</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.timegrid.app</string>
+    <key>NSUserNotificationAlertStyle</key>
+    <string>alert</string>
+    <key>NSFamilyControlsUsageDescription</key>
+    <string>TimeGrid reads your Screen Time usage so every minute of your day is accounted for without manual logging.</string>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>Not used. TimeGrid keeps all data on-device unless you sign in to sync.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.timegrid.refresh.screentime</string>
+    </array>
+    <key>TG_API_BASE</key>
+    <string>http://127.0.0.1:8000</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+</dict>
+</plist>
