@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from . import blocks as blocks_mod
@@ -27,6 +28,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="TimeGrid", version="0.1.0", lifespan=lifespan)
+
+# Permit dev-mode cross-origin from the Vite dev server. In prod the web
+# frontend is served from the same origin via nginx, so CORS isn't used.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=False,
+)
+
 app.include_router(blocks_mod.router)
 app.include_router(summary_mod.router)
 app.include_router(plan_mod.router)

@@ -12,6 +12,9 @@ hold yourself accountable at the minute level.
   JWT, offline-first sync. See [`ios/README.md`](ios/README.md).
 - `backend/` — FastAPI + MySQL. Endpoints for block upload, summary,
   and plan. Minute-level reconciliation job runs every 5 minutes.
+- `frontend/` — Vite + React + TypeScript + Tailwind. Day-to-day web
+  dashboard (Today / Plan / Review). Served behind nginx in prod, hot
+  reload via `npm run dev` locally. See [`frontend/README.md`](frontend/README.md).
 - `grafana/provisioning/` — MySQL datasource + `TimeGrid` dashboard
   (category pie, 7-day heatmap, unaccounted stat, planned-vs-actual).
 - `infra/` — Azure Bicep for App Service + MySQL Flexible Server +
@@ -29,6 +32,7 @@ docker compose up -d
 
 - MySQL: `localhost:3306`
 - Backend: `http://localhost:8000` (see `/docs`)
+- **Frontend: `http://localhost:5173`**
 - Grafana: `http://localhost:4500` (admin / admin)
 
 ### Quick test

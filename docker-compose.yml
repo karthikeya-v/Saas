@@ -36,6 +36,18 @@ services:
     networks:
       - timegrid
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: timegrid-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - timegrid
+
   grafana:
     image: grafana/grafana:latest
     container_name: timegrid-grafana

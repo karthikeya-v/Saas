@@ -19,5 +19,12 @@ ios/**/*.xcodeproj/project.xcworkspace/xcuserdata/
 backend/dist/
 backend/app.zip
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/tsconfig.tsbuildinfo
+frontend/*.tsbuildinfo
+
 # OS
 .DS_Store
