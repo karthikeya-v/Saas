@@ -3,8 +3,8 @@ version: "3.9"
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysql
-    restart: always
+    container_name: timegrid-mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: zeek_logs
@@ -14,47 +14,61 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./saas.csv:/docker-entrypoint-initdb.d/saas.csv
     networks:
-      - my_network
+      - timegrid
 
-  python:
+  backend:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: python
+      context: ./backend
+    container_name: timegrid-backend
+    restart: unless-stopped
     depends_on:
       - mysql
-    volumes:
-      - ./sql_processor.py:/app/sql_processor.py
-      - ./dns.log:/app/dns.log
     environment:
-      DB_HOST: mysql
-      DB_USER: zeek_user
-      DB_PASSWORD: zeek_password
-      DB_NAME: zeek_logs
-    command: ["python3", "/app/sql_processor.py"]
+      TG_DB_HOST: mysql
+      TG_DB_USER: zeek_user
+      TG_DB_PASSWORD: zeek_password
+      TG_DB_NAME: zeek_logs
+      TG_JWT_SECRET: dev-secret-change-me
+      TG_DEV_MODE: "true"
+    ports:
+      - "8000:8000"
     networks:
-      - my_network
+      - timegrid
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: timegrid-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - timegrid
 
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana
-    restart: always
+    container_name: timegrid-grafana
+    restart: unless-stopped
+    depends_on:
+      - mysql
     ports:
       - "4500:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
-      - my_network
+      - timegrid
 
 volumes:
   mysql-data:
   grafana-data:
 
 networks:
-  my_network:
+  timegrid:
     driver: bridge
-

@@ -1,0 +1,24 @@
+name: ios-ci
+
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios-ci.yml"
+  pull_request:
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios-ci.yml"
+
+jobs:
+  syntax-check:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Swift sources (syntax only)
+        working-directory: ios/TimeGrid/TimeGrid
+        run: |
+          # Without a real Xcode project in the repo, we do a cheap syntax
+          # check on each Swift file. The project is generated locally.
+          find . -name "*.swift" -print0 | xargs -0 -n1 swiftc -parse
